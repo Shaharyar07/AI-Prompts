@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import PromptCard from "./PromptCard";
 
 const PromptCardList = ({ data, handleTagClick }) => {
@@ -19,18 +19,43 @@ const PromptCardList = ({ data, handleTagClick }) => {
 const Feed = () => {
   const [searchText, setSearchText] = useState("");
   const [prompts, setPrompts] = useState([]);
+  const [searchPrompts, setSearchPrompts] = useState([]);
 
   useEffect(() => {
     const fetchPrompts = async () => {
       const res = await fetch("/api/prompt");
       const data = await res.json();
-
       setPrompts(data);
     };
     fetchPrompts();
   }, []);
 
-  const handleSearchChange = (e) => {};
+  const handleSearchChange = (e) => {
+    const searchText = e.target.value;
+    setSearchText(searchText);
+
+    if (searchText === "") {
+      setSearchPrompts([]);
+    } else {
+      const filteredPrompts = prompts.filter((prompt) => {
+        return (
+          prompt.prompt.toLowerCase().includes(searchText.toLowerCase()) ||
+          prompt.creator.username
+            .toLowerCase()
+            .includes(searchText.toLowerCase()) ||
+          prompt.tag.toLowerCase().includes(searchText.toLowerCase())
+        );
+      });
+      setSearchPrompts(filteredPrompts);
+    }
+  };
+  const handleTagClick = (tag) => {
+    setSearchText(`#${tag}`);
+    const filteredPrompts = prompts.filter((prompt) => {
+      return prompt.tag.toLowerCase() === tag.toLowerCase();
+    });
+    setSearchPrompts(filteredPrompts);
+  };
   return (
     <section className='feed'>
       <form action='' className='flex w-full flex-center'>
@@ -40,9 +65,14 @@ const Feed = () => {
           className='search_input peer'
           value={searchText}
           onChange={handleSearchChange}
+          required
         />
       </form>
-      <PromptCardList data={prompts} handleTagClick={() => {}} />
+      {searchText ? (
+        <PromptCardList data={searchPrompts} handleTagClick={handleTagClick} />
+      ) : (
+        <PromptCardList data={prompts} handleTagClick={handleTagClick} />
+      )}
     </section>
   );
 };
