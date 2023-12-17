@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        // Define environment variables here if needed, like NODE_ENV
-        // NODE_ENV = 'production'
-    }
 
     stages {
         stage('Checkout') {
@@ -16,9 +12,6 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                // Use Node Version Manager (nvm) to set Node.js version
-                sh 'nvm use' // Make sure nvm is installed or use another way to manage Node version
-
                 // Install Node.js dependencies
                 sh 'npm install'
             }
