@@ -3,12 +3,6 @@ pipeline {
 
 
     stages {
-        stage('Checkout') {
-            steps {
-                // Clone the Git repository
-                git url: 'https://github.com/Shaharyar07/AI-Prompts.git'
-            }
-        }
 
         stage('Install Dependencies') {
             steps {
